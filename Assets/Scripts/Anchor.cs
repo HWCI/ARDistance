@@ -5,44 +5,81 @@ using UnityEngine.XR.ARFoundation;
 public class Anchor
 {
         private float curDistance = 0;
-        private GameObject line;
+        private GameObject anchorObj;
         private LineRenderer lr;
         private ARAnchor anchorRef;
-        private const float MAXDistance = 1000;
+        private const float MAXDistance = 30000;
         private DepthDetection depthDetection;
         private Camera camera;
-
-        public Anchor(DepthDetection dD, Camera cam)
+        private TextMesh txtMesh;
+        private bool isLabelA;
+        
+        //Setup anchor object with LineRenderer and Text
+        public Anchor(DepthDetection dD, Camera cam, bool isA) 
         {
-                line = new GameObject();
-                line.AddComponent<LineRenderer>();
-                lr = line.GetComponent<LineRenderer>();
+                anchorObj = new GameObject();
+                anchorObj.AddComponent<LineRenderer>();
+                lr = anchorObj.GetComponent<LineRenderer>();
                 ShowLine(false);
                 depthDetection = dD;
-                Camera camera = cam;
+                camera = cam;
+                isLabelA = isA;
+                CreateLineRenderer();
+                CreateTextMesh();
         }
 
-        public void UpdateLine() //Update positions and draw the line
+        private void CreateLineRenderer()
+        {
+                lr.startWidth = 0.01f;
+                lr.endWidth = 0.01f;
+                lr.useWorldSpace = true;
+                lr.alignment = LineAlignment.View;
+                Material mat = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+                lr.material = mat;
+        }
+
+        private void CreateTextMesh()
+        {
+                txtMesh = anchorObj.AddComponent<TextMesh>();
+                txtMesh.characterSize = 16f;
+                txtMesh.fontSize = 16;
+                txtMesh.offsetZ += 40f;
+                txtMesh.transform.localPosition += new Vector3(-200f, 10f, 100f);
+                txtMesh.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+        }
+
+        //Update positions and draw the line
+        public void UpdateLine() 
         {
                 if (lr.enabled)
                 {
                         Vector3 anchorLocation = anchorRef.transform.position;
                         var cameraLocation = camera.transform.position;
-                        curDistance = GetDistance();
-                        line.transform.position = anchorLocation;
-                        lr.startColor = GetLineColor();
-                        lr.startWidth = 0.2f;
+                        Vector3 lineEndLocation = new Vector3(cameraLocation.x, cameraLocation.y - 0.5f, cameraLocation.z);
+                        curDistance = GetDistance(); 
+                        anchorObj.transform.position = anchorLocation;
+                        var color = GetLineColor();
+                        lr.startColor = color;
+                        lr.endColor = color;
                         lr.SetPosition(0, anchorLocation);
-                        lr.SetPosition(1, cameraLocation);
+                        lr.SetPosition(1, lineEndLocation);
+                        txtMesh.transform.rotation = Quaternion.LookRotation(txtMesh.transform.position - cameraLocation);
+                        if (isLabelA)
+                        {
+                                txtMesh.text = "A=" + curDistance/100 + "cm";
+                        }
+                        else
+                        {
+                                txtMesh.text = "B="+ curDistance/100 + "cm";
+                        }
                 }
         }
 
-        public float GetDistance() //Get distance by using depth data
+        //Get distance by using depth data
+        public float GetDistance() 
         {
                 Vector3 screenPoint = camera.WorldToScreenPoint(anchorRef.transform.position);
-                int screenX = (int)screenPoint.x;
-                int screenY = (int)screenPoint.y;
-                return depthDetection.GetDepthFromXY(screenX, screenY);
+                return depthDetection.GetDepthFromScreenPoint((int) screenPoint.x, (int) screenPoint.y);
         }
 
         public void ShowLine(bool enable)
@@ -52,18 +89,18 @@ public class Anchor
 
         public Color GetLineColor()
         {
-                Color newColor = Color.Lerp(Color.red, Color.blue, MAXDistance/curDistance);
+                Color newColor = Color.Lerp(Color.red, Color.green, curDistance/MAXDistance);
                 return newColor;
         }
 
+        //Clear and set new anchor
         public void SetAnchor(ARAnchor anchor)
         {
+                if (anchorRef != null)
+                {
+                        Object.Destroy(anchorRef.gameObject);
+                }
                 anchorRef = anchor;
                 ShowLine(true);
-        }
-
-        public float LineDistance
-        {
-                get => curDistance;
         }
 }

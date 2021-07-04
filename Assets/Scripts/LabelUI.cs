@@ -6,7 +6,8 @@ public class LabelUI
     private Text aDistanceTxt;
     private Text bDistanceTxt;
 
-    public LabelUI() //Setup Canvas
+    //Setup Canvas
+    public LabelUI() 
     {
         GameObject uibase = new GameObject();
         uibase.name = "UICanvas";
@@ -22,8 +23,9 @@ public class LabelUI
         bTxt.name = "LabelBDistance";
         CreateText(aTxt, bTxt);
     }
-
-    private void CreateText(GameObject aTxt, GameObject bTxt) //Creates the two updating text
+    
+    //Creates the two updating text
+    private void CreateText(GameObject aTxt, GameObject bTxt) 
     {
         aDistanceTxt = aTxt.AddComponent<Text>();
         aDistanceTxt.text = "A: ";
@@ -47,9 +49,9 @@ public class LabelUI
         bRectTransform.sizeDelta = new Vector2(1000, 100);
     }
 
-    public void UpdateUI(float distA = 0, float distB = 0)
+    public void UpdateUI(float distA, float distB)
     {
-        aDistanceTxt.text = "A: " + distA + " cm";
-        bDistanceTxt.text = "B: " + distB + " cm";
+        aDistanceTxt.text = "A: " + distA/100 + " cm";
+        bDistanceTxt.text = "B: " + distB/100 + " cm";
     }
 }

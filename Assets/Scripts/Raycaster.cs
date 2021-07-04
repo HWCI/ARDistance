@@ -20,27 +20,60 @@ public class Raycaster
                 planeManager = pM;
                 callback = onHit;
         }
-        public bool ProcessInput() //false = no new touch input
+        
+        //Check for inputs
+        public void ProcessInput() 
         {
-                if (Input.touchCount == 0) return false;
+                if (Input.touchCount == 0)
+                        return;
                 
                 var touch = Input.GetTouch(0);
-                if (touch.phase != TouchPhase.Began) return false;
-                
-                if (raycastManager.Raycast(touch.position, hits, TrackableType.PlaneWithinPolygon)) //Raycast touch location and pass ARAnchor
+                if (touch.phase != TouchPhase.Began)
+                        return;
+
+                // Raycast against planes and feature points
+                const TrackableType trackableTypes =
+                        TrackableType.FeaturePoint |
+                        TrackableType.PlaneWithinPolygon;
+
+                // Perform the raycast
+                if (raycastManager.Raycast(touch.position, hits, trackableTypes))
                 {
-                        var hitPose = hits[0].pose;
-                        var hitTrackableId = hits[0].trackableId;
-                        var hitPlane = planeManager.GetPlane(hitTrackableId);
-                        ARAnchor anchor = anchorManager.AttachAnchor(hitPlane, hitPose);
-                        if (anchor != null)
+                        // Raycast hits are sorted by distance, so the first one will be the closest hit.
+                        var hit = hits[0];
+
+                        // Create a new anchor
+                        var anchor = CreateAnchor(hit);
+                        if (anchor)
                         {
+                                Debug.Log("Created anchor " + hitCount);
                                 hitCount++;
                                 callback(anchor, hitCount % 2);
-                                return true;
+                        }
+                        else
+                        {
+                                Debug.Log("Error creating anchor");
                         }
                 }
-                return false;
+        }
+        
+        //Create an ARanchor on raycast hit position
+        ARAnchor CreateAnchor(in ARRaycastHit hit)
+        {
+                ARAnchor anchor = null;
+                if (hit.trackable is ARPlane plane)
+                {
+                        if (planeManager)
+                        {
+                                anchor = anchorManager.AttachAnchor(plane, hit.pose);
+                                return anchor;
+                        }
+                }
+                var gameObject = new GameObject();
+                gameObject.transform.position = hit.pose.position;
+                gameObject.transform.rotation = hit.pose.rotation;
+                anchor = gameObject.AddComponent<ARAnchor>();
+                return anchor;
         }
         
         
