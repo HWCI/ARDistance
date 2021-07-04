@@ -44,7 +44,7 @@ public class Anchor
                 txtMesh.characterSize = 16f;
                 txtMesh.fontSize = 16;
                 txtMesh.offsetZ += 40f;
-                txtMesh.transform.localPosition += new Vector3(-200f, 10f, 100f);
+                txtMesh.transform.localPosition += new Vector3(-200f, 10f, 120f);
                 txtMesh.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
         }
 
@@ -66,11 +66,11 @@ public class Anchor
                         txtMesh.transform.rotation = Quaternion.LookRotation(txtMesh.transform.position - cameraLocation);
                         if (isLabelA)
                         {
-                                txtMesh.text = "A=" + curDistance/100 + "cm";
+                                txtMesh.text = "A=" + (int)(curDistance/100) + "cm";
                         }
                         else
                         {
-                                txtMesh.text = "B="+ curDistance/100 + "cm";
+                                txtMesh.text = "B="+ (int)(curDistance/100) + "cm";
                         }
                 }
         }
@@ -79,7 +79,7 @@ public class Anchor
         public float GetDistance() 
         {
                 Vector3 screenPoint = camera.WorldToScreenPoint(anchorRef.transform.position);
-                return depthDetection.GetDepthFromScreenPoint((int) screenPoint.x, (int) screenPoint.y);
+                return depthDetection.GetDepthFromScreenPoint((int)screenPoint.x, (int)screenPoint.y);
         }
 
         public void ShowLine(bool enable)

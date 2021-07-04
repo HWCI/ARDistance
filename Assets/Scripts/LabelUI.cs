@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+//Debug UI, to be removed 
 public class LabelUI
 {
     private Text aDistanceTxt;
