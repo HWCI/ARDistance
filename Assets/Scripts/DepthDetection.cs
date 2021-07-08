@@ -78,8 +78,15 @@ public class DepthDetection
     
     public Vector2 ScreenToDepthUV(Vector2 uv)
     {
-        var transformed = depthDisplayMatrix * new Vector4(uv.x, 1 - uv.y, 1f, 0f); //Reorient the depth image to screen
+        Vector4 transformed;
+#if UNITY_ANDROID
+        transformed = depthDisplayMatrix * new Vector4(uv.x, 1 - uv.y, 1f, 0f); //Reorient the depth image to screen
+#endif
+#if UNITY_IOS
+        return uv;
+#endif
         return new Vector2(transformed.x, transformed.y);
+
     }
 
 }

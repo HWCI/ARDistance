@@ -41,11 +41,9 @@ public class Anchor
         private void CreateTextMesh()
         {
                 txtMesh = anchorObj.AddComponent<TextMesh>();
-                txtMesh.characterSize = 16f;
-                txtMesh.fontSize = 16;
-                txtMesh.offsetZ += 40f;
-                txtMesh.transform.localPosition += new Vector3(-200f, 10f, 120f);
-                txtMesh.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+                txtMesh.characterSize = 0.1f;
+                txtMesh.fontSize = 32;
+                txtMesh.offsetZ = 1;
         }
 
         //Update positions and draw the line
