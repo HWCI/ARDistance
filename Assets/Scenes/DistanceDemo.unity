@@ -569,6 +569,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ARCamera: {fileID: 1354141926}
+  LabelObject: {fileID: 1518434681053219547, guid: d87cc56843242b543b005914c8b2cfbc,
+    type: 3}
 --- !u!114 &1659859604
 MonoBehaviour:
   m_ObjectHideFlags: 0

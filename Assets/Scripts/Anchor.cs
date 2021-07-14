@@ -13,9 +13,11 @@ public class Anchor
         private Camera camera;
         private TextMesh txtMesh;
         private bool isLabelA;
+        private GameObject labelObject;
+        private Animation labelAnim;
         
         //Setup anchor object with LineRenderer and Text
-        public Anchor(DepthDetection dD, Camera cam, bool isA) 
+        public Anchor(DepthDetection dD, Camera cam, bool isA, GameObject lO) 
         {
                 anchorObj = new GameObject();
                 anchorObj.AddComponent<LineRenderer>();
@@ -24,8 +26,11 @@ public class Anchor
                 depthDetection = dD;
                 camera = cam;
                 isLabelA = isA;
+                labelObject = Object.Instantiate(lO, lr.transform, true);
+                labelObject.SetActive(false);
                 CreateLineRenderer();
                 CreateTextMesh();
+                
         }
 
         private void CreateLineRenderer()
@@ -41,7 +46,7 @@ public class Anchor
         private void CreateTextMesh()
         {
                 txtMesh = anchorObj.AddComponent<TextMesh>();
-                txtMesh.characterSize = 0.1f;
+                txtMesh.characterSize = 0.075f;
                 txtMesh.fontSize = 32;
                 txtMesh.offsetZ = 1;
         }
@@ -53,7 +58,7 @@ public class Anchor
                 {
                         Vector3 anchorLocation = anchorRef.transform.position;
                         var cameraLocation = camera.transform.position;
-                        Vector3 lineEndLocation = new Vector3(cameraLocation.x, cameraLocation.y - 0.5f, cameraLocation.z);
+                        Vector3 lineEndLocation = new Vector3(cameraLocation.x, cameraLocation.y - 0.3f, cameraLocation.z);
                         curDistance = GetDistance(); 
                         anchorObj.transform.position = anchorLocation;
                         var color = GetLineColor();
@@ -100,5 +105,7 @@ public class Anchor
                 }
                 anchorRef = anchor;
                 ShowLine(true);
+                labelObject.SetActive(true);
+                labelObject.GetComponentInChildren<Animation>().Play();
         }
 }
